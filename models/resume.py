@@ -41,6 +41,16 @@ class Experience(BaseModel):
     """Модель опыта работы"""
     description: str = Field(..., description="Описание опыта работы")
     position: str = Field(..., description="Должность")
+    start: Optional[str] = Field(None, description="Дата начала работы")
+    end: Optional[str] = Field(None, description="Дата окончания работы")
+
+    class Config:
+        extra = "forbid"        # <--- Добавляем
+        
+class ExperienceUpdate(BaseModel):
+    """Модель опыта работы"""
+    description: str = Field(..., description="Описание опыта работы")
+    position: str = Field(..., description="Должность")
 
     class Config:
         extra = "forbid"        # <--- Добавляем
@@ -82,3 +92,30 @@ class ResumeInfo(BaseModel):
     class Config:
         extra = "forbid"        # <--- Добавляем
         title = "ResumeInfo"    # (можно явно указать заголовок для схемы)
+        
+        
+class ResumeUpdate(BaseModel):
+    """
+    Модель данных резюме.
+    
+    Attributes:
+        title: Желаемая должность
+        skills: Дополнительная информация, описание навыков
+        skill_set: Ключевые навыки (список уникальных строк)
+        experience: Список опыта работы
+        employments: Список предпочитаемых типов занятости
+        schedules: Список предпочитаемых графиков работы
+        languages: Список языков и уровней владения
+        relocation: Информация о релокации
+        salary: Зарплатные ожидания
+        professional_roles: Список профессиональных ролей
+    """
+    title: str = Field(..., description="Желаемая IT должность")
+    skills: str = Field(..., description="Дополнительная информация, описание навыков в свободной подробной форме перечисляя все ключевые навыки и скилы")
+    skill_set: List[str] = Field(..., description="Ключевые навыки (список уникальных строк)")
+    experience: List[ExperienceUpdate] = Field(..., description="Список опыта работы. ВНИМАНИЕ! ВОЗВРАЩАЙТЕ КОЛЛИЧЕСТВО ОБЬЕКТОВ ExperienceUpdate РАВНОЕ КОЛЛИЧЕСТВУ ОБЬЕКТОВ Experience В ПЕРЕДАННОМ РЕЗЮМЕ")
+    professional_roles: List[ProfessionalRole] = Field(..., description="Список профессиональных ролей")
+
+    class Config:
+        extra = "forbid"        # <--- Добавляем
+        title = "ResumeUpdate"    # (можно явно указать заголовок для схемы)

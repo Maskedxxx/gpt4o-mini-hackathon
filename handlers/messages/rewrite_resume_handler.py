@@ -9,11 +9,22 @@ from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
 from core.states import UserState
 from core.logger import setup_logger
-from core.text import *
+from models.gap_analysis import GapAnalysisResult
+from models.resume import ResumeUpdate
 from services.entity_extractor import EntityExtractor
 from services.hh_api import HeadHunterAPI
 from services.llm_service import LLMService
 from services.resume_updater import ResumeUpdaterService 
+from core.text import (
+    ERROR_MSG,
+    INVALID_RESUME_LINK,
+    RESUME_FOUND,
+    RESUME_PARSED,
+    INVALID_VACANCY_LINK,
+    VACANCY_FOUND,
+    VACANCY_PARSED,
+    
+)
 
 logger = setup_logger(__name__)
 
@@ -179,12 +190,12 @@ class RewriteResumeHandler:
                 await message.answer("Произошла ошибка при обновлении резюме на сайте.")
                 return
 
-            # Формируем сообщение об успехе, теперь используем поля Pydantic-модели напрямую
+            # Формируем ссылку на обновлённое резюме и выводим её пользователю
+            resume_url = f"https://hh.ru/resume/{resume_id}"
             success_message = (
                 "✅ Резюме успешно обновлено!\n\n"
-                f"Заголовок: {final_resume.title}\n"
-                f"Основные навыки (первые 100 символов): {final_resume.skills[:100]}...\n"
-                f"Количество обновленных позиций в опыте: {len(final_resume.experience)}"
+                "Посмотреть обновлённое резюме можно по ссылке:\n"
+                f"{resume_url}"
             )
 
             await message.answer(success_message)
@@ -204,8 +215,8 @@ class RewriteResumeHandler:
         original_resume: dict,
         parsed_resume: dict,
         parsed_vacancy: dict,
-        gap_result: "GapAnalysisResult",  # Если нужно, можно и без кавычек
-        final_resume: "ResumeUpdate"
+        gap_result: GapAnalysisResult, 
+        final_resume: ResumeUpdate
     ) -> None:
         """
         Сохраняет все промежуточные и финальные данные в отдельную папку:
@@ -232,7 +243,7 @@ class RewriteResumeHandler:
             self._write_json(folder_path / "original_resume.json", original_resume)
             self._write_json(folder_path / "parsed_resume.json", parsed_resume)
             
-            # Если у вас есть "original_vacancy" (сырые данные вакансии),
+            # Если есть "original_vacancy" (сырые данные вакансии),
             # можете так же сохранить:
             # self._write_json(folder_path / "original_vacancy.json", original_vacancy)
 

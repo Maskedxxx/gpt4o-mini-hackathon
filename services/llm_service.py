@@ -66,7 +66,7 @@ class LLMService:
             completion = self.client.beta.chat.completions.parse(
                 model=self.model,
                 messages=messages,
-                temperature=0,
+                temperature=0.25,
                 response_format=ResumeGapAnalysis
             )
 
@@ -112,8 +112,9 @@ class LLMService:
                 {
                     "role": "system",
                     "content": (
-                        "Ты — эксперт HR. Учитывай GAP-анализ и требования вакансии. "
-                        "Возвращай только валидный JSON (Recommendation)."
+                        "Ты — эксперт HR. Учитывайте GAP-анализ и требования вакансии выпереписываете резюме. "
+                        "Выполните изменение резюме тех разделов что указаны в gap-анализе. "
+                        "ЦЕЛЬ результата: переписанные секции резюме выполненные по рекомендациям из gap-анализа"
                     )
                 },
                 {
@@ -126,6 +127,8 @@ class LLMService:
             completion = self.client.beta.chat.completions.parse(
                 model=self.model,
                 messages=messages,
+                logprobs = True,
+                top_logprobs = 2,
                 temperature=0.2,
                 response_format=ResumeUpdate  # парсим сразу в модель ResumeUpdate
             )
@@ -188,7 +191,7 @@ class LLMService:
         
         Your goal is to help the candidate create a highly personalized resume that closely matches the requirements of the position they're applying for. Follow these steps:
 
-        1. Extract key requirements from the job description, including required skills, qualifications, experience, responsibilities, and industry-specific knowledge or certifications.
+        1. Extract key requirements from the job description, including required skills, title, qualifications, experience, responsibilities, and industry-specific knowledge or certifications.
 
         2. Identify relevant experiences and skills from the resume.
 
@@ -198,24 +201,22 @@ class LLMService:
 
         5. Generate specific, actionable recommendations on how to enhance the resume.
 
-        Before providing your final analysis and recommendations, break down your thought process in <resume_job_comparison> tags:
+        Important Notes:
+        - For the "experience" section, provide separate recommendations for each experience entry in the resume. Use "Experience[0]", "Experience[1]", etc., to specify which entry you're referring to.
+        - For the "skills" section, list all necessary additions or updates in a single recommendation.
+        - When recommending changes to the experience section, provide specific guidance on how to modify the existing content to better align with job requirements. For example, if the job requires API experience and the resume mentions developing a Telegram bot, suggest adding details about API integration in that project.
 
-        - List key requirements from the job description
-        - For each requirement, find matching elements in the resume
-        - Note any gaps or mismatches between the job requirements and the resume
-        
-        <VERY IMPORTANT NOTE>:
-        If you choose the “experience” section, be sure to go through all the objects in the array and specify what to change or update. 
-        For example: “section”: “Experience[0]”, -> ‘section’: “Experience[1]”, and so on
-        And if you choose the “skills” section, then in this section list all the things that need to be added or updated.
-        </VERY IMPORTANT NOTE>
-        
-        It's OK for this section to be quite long. This will ensure a thorough interpretation of both the resume and job description.
+        Before providing your final recommendations, wrap your analysis in <resume_job_analysis> tags. In this analysis:
+
+        1. List the key requirements extracted from the job description.
+        2. Match relevant experiences and skills from the resume to the job requirements.
+        3. Identify any gaps or mismatches between the resume and job requirements.
+        4. Outline potential areas for improvement in the resume.
+
+        Present your final analysis and recommendations using the following
 
         Present your final analysis and recommendations using the following Pydantic model structure:
         <<<ResumeGapAnalysis>>>
-
-        Remember to provide comprehensive analysis in the <resume_job_comparison> section before presenting the final recommendations in the structured JSON format.
         """
     
     def _create_final_rewrite_prompt(
@@ -242,7 +243,7 @@ class LLMService:
             title: {parsed_resume.get("title")}
             skills: {parsed_resume.get("skills")}
             skill_set: {parsed_resume.get("skill_set")}
-            experience: {parsed_resume.get("experience")}
+            experience: (List obj) {parsed_resume.get("experience")}
             professional_roles: {parsed_resume.get("professional_roles")}
             </original_resume>
 
@@ -259,15 +260,15 @@ class LLMService:
             - experience
             - professional_roles
             
-            4. Pay special attention to the “skills” and “experience” (VERY IMPORTANT “experience”) sections to maximize their relevance to the job requirements. For the “experience” section:
-                - Confirm that each work experience record will be rewritten to address the recommendations of the GAP analysis, while retaining the essence and key skills from the original experience.
-                - Carefully rewrite each entry to include references from the GAP analysis, while keeping the essence of the original experience.
+            3. Pay special attention to the “skills”, "skill_set" and “experience” (VERY IMPORTANT “experience”) sections to maximize their relevance to the job requirements. For the “experience” section:
+                - Confirm that each work experience record will be rewritten (CHANGED) to address the recommendations of the GAP analysis, while retaining the essence and key skills from the original experience.
+                - Carefully rewrite (CHANGE) each entry to include references from the GAP analysis, while keeping the essence of the original experience.
                 - Keep descriptions full length, avoiding abbreviations.
-                - Don't just add a few words at the end of each entry, but change the very structure of the <experience> key text to fulfill the recommendations from the GAP analysis.
+                - Don't just add a few words at the end of each entry, but change (REWRITE) the very structure of the <experience> key text to fulfill the recommendations from the GAP analysis.
                 - Make sure the number of items in the Experience section remains the same as in the original resume.
                 - Do not modify the 'position' field in the experience array.
 
-            5. Consider the following aspects of the GAP analysis when updating your resume:
+            4. Consider the following when updating your resume:
                 - Skills that need to be emphasized or enhanced THIS IS IMPORTANT.
                 - Missing skills that can be abstractly included or implied without misrepresenting experience
                 - Information that may not be relevant to the position and how to rephrase it

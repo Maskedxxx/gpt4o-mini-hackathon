@@ -1,0 +1,35 @@
+/app_talebot
+├── .env
+├── .gitignore
+├── config/
+│   └── config.py
+├── core/
+│   ├── logger.py
+│   ├── states.py
+│   └── text.py
+├── data/
+│   └── resume.py
+├── handlers/
+│   ├── commands/
+│   │   ├── auth.py
+│   │   └── start.py
+│   └── messages/
+│       ├── authorized_state_handler.py
+│       ├── initial_state_handler.py
+│       ├── rewrite_resume_handler.py
+│       └── unauthorized_state_handler.py
+├── keyboards/
+│   └── reply.py
+├── main.py
+├── models/
+│   ├── gap_analysis.py
+│   ├── recommendations.py
+│   ├── resume.py
+│   ├── resume_vacancy.py
+│   └── vacancy.py
+├── services/
+│   ├── callback_server.py
+│   ├── entity_extractor.py
+│   ├── hh_api.py
+│   ├── llm_service.py
+│   └── resume_updater.py

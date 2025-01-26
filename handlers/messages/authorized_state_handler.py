@@ -5,9 +5,15 @@ from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
 from core.states import UserState
 from core.logger import setup_logger
-from core.text import *
 from keyboards.reply import get_main_keyboard
 from services.hh_api import HeadHunterAPI
+from core.text import (
+    EDIT_RESUME_BTN,
+    CREATE_RESUME_BTN,
+    DEFAULT_RESPONSE,
+    ERROR_MSG,
+    WAITING_RESUME_LINK
+)
 
 logger = setup_logger(__name__)
 

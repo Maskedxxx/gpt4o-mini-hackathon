@@ -1,0 +1,36 @@
+# Скомпилированные Python-файлы
+*.py[cod]
+*.pyc
+*.pyo
+*.pyd
+
+# Устаревшие файлы
+legacy/
+
+# Каталоги кэша
+__pycache__/
+*/__pycache__/
+
+# Личные/секретные настройки окружения
+.env
+.venv/
+venv/
+env/
+
+# Лог-файлы
+*.log
+LOG/
+
+# IDE/редактор
+.vscode/
+.idea/
+
+# Системные файлы macOS/Windows и т.д.
+.DS_Store
+Thumbs.db
+
+# Разные артефакты сборки (если используете)
+build/
+dist/
+*.egg-info/
+.eggs/

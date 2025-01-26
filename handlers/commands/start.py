@@ -1,12 +1,22 @@
 # handlers/commands/start.py
+
 from typing import Any
 from aiogram import Bot
 from aiogram.types import Message
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
+
 from core.states import UserState
 from core.logger import setup_logger
 from keyboards.reply import get_initial_keyboard, get_unauthorized_keyboard
+
+# Импортируем нужные текстовые константы
+from core.text import (
+    ERROR_MSG,
+    GREETING_BASE,
+    GREETING_AUTH_INTERRUPTED,
+    GREETING_NEED_AUTH
+)
 
 logger = setup_logger(__name__)
 
@@ -44,25 +54,16 @@ class StartCommandHandler:
         # Устанавливаем начальное состояние
         await state.set_state(UserState.initial)
         
-        # Формируем приветственное сообщение
-        greeting_text = (
-            f"👋 Здравствуйте, {message.from_user.full_name}!\n\n"
-            "Я бот для создания персонализированных резюме. "
-            "Я помогу вам создать профессиональное резюме, "
-            "которое выделит вас среди других кандидатов.\n\n"
-        )
+        # Формируем приветственное сообщение 
+        greeting_text = f"👋 Здравствуйте, {message.from_user.full_name}!\n\n{GREETING_BASE}"
         
-        # Добавляем информацию об авторизации (если юзер нажал start в процессе авторизации)
+        # Добавляем информацию об авторизации (если юзер нажал /start в процессе авторизации)
         if current_state == UserState.unauthorized:
-            greeting_text += (
-                "🔄 Процесс авторизации был прерван.\n"
-                "Для продолжения работы необходимо пройти авторизацию заново."
-            )
+            greeting_text += GREETING_AUTH_INTERRUPTED
         else:
-            greeting_text += "Для начала работы вам необходимо пройти авторизацию."
+            greeting_text += GREETING_NEED_AUTH
         
         # Отправляем приветственное сообщение
-        # Отправляем сообщение + клавиатура
         try:
             await message.answer(
                 greeting_text,
@@ -71,4 +72,4 @@ class StartCommandHandler:
             logger.info(f"Отправлено приветственное сообщение пользователю {message.from_user.id}")
         except Exception as e:
             logger.error(f"Ошибка при отправке приветственного сообщения: {e}")
-            await message.answer("Произошла ошибка. Пожалуйста, попробуйте позже.")
+            await message.answer(ERROR_MSG)

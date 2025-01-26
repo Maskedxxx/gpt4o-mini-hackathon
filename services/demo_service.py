@@ -27,6 +27,11 @@ class DemoService:
         Создает туннель ngrok и обновляет redirect_uri в конфигурации.
         """
         if self.config.environment != Environment.DEMO:
+            print("\n=== ВАЖНО ===")
+            print("Переключение в режим разработки.")
+            print("Убедитесь, что в настройках API вашего аккаунта разработчика на HeadHunter установлен Redirect URI:")
+            print("http://localhost:8000/callback")
+            print("============\n")
             return
             
         try:
@@ -49,7 +54,7 @@ class DemoService:
         """Выводит инструкции по настройке для демонстрационного режима."""
         print("\n=== ВАЖНО ===")
         print("Для демонстрации приложения выполните следующие шаги:")
-        print("1. Перейдите в настройки вашего приложения на HeadHunter")
+        print("1. Перейдите в что в настройках API вашего аккаунта разработчика приложения на HeadHunter")
         print("2. Добавьте следующий Redirect URI:")
         print(f"   {self.config.hh.redirect_uri}")
         print("3. Сохраните изменения")

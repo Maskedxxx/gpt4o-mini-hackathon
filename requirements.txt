@@ -1,0 +1,9 @@
+aiogram>=3.0
+aiohttp
+python-dotenv
+pydantic
+requests
+openai
+ngrok
+pyngrok
+uvloop; sys_platform != "win32" 

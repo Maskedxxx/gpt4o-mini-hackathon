@@ -11,7 +11,7 @@ class GapAnalysisResult(BaseModel):
 class Recommendation(BaseModel):
     section: str = Field(..., description = "Name of the section to which the recommendation applies (enum: 'title', 'skills', 'skill_set', 'experience', 'professional_roles')")
     recommendation_type: str = Field(..., description = "Type of recommendation (enum: 'add', 'update', 'remove')")
-    details: str = Field(..., description = "Detailed and precise description of step-by-step necessary changes (updates) in the summary, according to the GAP-analysis instructions")
+    details: List[str] = Field(..., description = "Detailed and precise description of step-by-step necessary changes (updates) in the summary, according to the GAP-analysis instructions. PS: minimum 3 item")
     
     class Config:
         extra = "forbid"        # <--- Добавляем

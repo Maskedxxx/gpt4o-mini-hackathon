@@ -19,7 +19,9 @@ class DemoService:
             config: Конфигурация приложения
         """
         self.config = config
-        self._tunnel: Optional[str] = None
+        self._tunnel = None
+        # Настраиваем конфигурацию ngrok
+        ngrok.set_auth_token("2ddCqDTXHAiJGpVlwsM9i1hGVH3_35GapDk7x4UvrRfhJk3UH")  
     
     async def setup(self) -> None:
         """
@@ -36,11 +38,14 @@ class DemoService:
             
         try:
             # Запускаем ngrok туннель
-            self._tunnel = ngrok.connect(8000).public_url
+            self._tunnel = ngrok.connect(
+                8000,
+                "http"
+            ).public_url
             logger.info(f"Ngrok туннель создан: {self._tunnel}")
             
             # Обновляем redirect_uri в конфигурации
-            self.config.hh.update_redirect_uri(self._tunnel)
+            self.config.hh.update_redirect_uri(f"{self._tunnel}")
             logger.info(f"Обновлен redirect_uri: {self.config.hh.redirect_uri}")
             
             # Выводим инструкции для настройки

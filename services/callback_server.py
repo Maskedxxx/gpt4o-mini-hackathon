@@ -27,7 +27,7 @@ class CallbackServer:
         
     def _setup_routes(self):
         """Настройка маршрутов веб-сервера."""
-        self.app.router.add_get('/callback', self._handle_callback)
+        self.app.router.add_get('/', self._handle_callback)
     
     async def _handle_callback(self, request: web.Request) -> web.Response:
         """Обработчик callback запроса от OAuth2."""

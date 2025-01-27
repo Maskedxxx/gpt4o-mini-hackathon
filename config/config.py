@@ -28,11 +28,10 @@ class HHConfig:
     client_id: str
     client_secret: str
     redirect_uri: str
-    base_redirect_path: str = "/callback"
+    base_redirect_path: str = ""
     
     def update_redirect_uri(self, new_base_url: str):
-        """Обновляет redirect_uri с новым базовым URL."""
-        self.redirect_uri = f"{new_base_url}{self.base_redirect_path}"
+        self.redirect_uri = new_base_url
 
 
 @dataclass

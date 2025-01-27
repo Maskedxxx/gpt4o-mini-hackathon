@@ -79,12 +79,12 @@ class AuthCommandHandler:
                 await message.answer(AUTH_SERVER_ERROR_MSG)
                 return
             
-            # В демо режиме используем URL из конфигурации
-            if self.config.environment == Environment.DEMO:
-                domain = os.environ.get('RENDER_EXTERNAL_URL')
-                if domain:
-                    self.hh_api.redirect_uri = f"{domain}/callback"
-                    logger.info(f"Установлен redirect_uri: {self.hh_api.redirect_uri}")
+            # # В демо режиме используем URL из конфигурации
+            # if self.config.environment == Environment.DEMO:
+            #     domain = os.environ.get('RENDER_EXTERNAL_URL')
+            #     if domain:
+            #         self.hh_api.redirect_uri = f"{domain}/callback"
+            #         logger.info(f"Установлен redirect_uri: {self.hh_api.redirect_uri}")
             
             # Получаем URL для авторизации
             auth_url = self.hh_api.get_auth_url()

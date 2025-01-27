@@ -6,4 +6,6 @@ services:
     startCommand: python main.py
     envVars:
       - key: ENVIRONMENT
-        value: production
+        value: demo  # Меняем на demo вместо production
+    ports:
+      - port: 8000  # Добавляем явное указание порта

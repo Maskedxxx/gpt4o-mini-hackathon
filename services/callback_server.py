@@ -3,6 +3,7 @@ from aiohttp import web
 from typing import Optional, Callable
 from core.logger import setup_logger
 import requests
+import os
 
 logger = setup_logger(__name__)
 
@@ -14,16 +15,10 @@ class CallbackServer:
     и передает его в обработчик.
     """
     
-    def __init__(self, host: str = 'localhost', port: int = 8000):
-        """
-        Инициализация сервера.
-        
-        Args:
-            host: Хост для запуска сервера (localhost или 0.0.0.0 для внешнего доступа)
-            port: Порт для запуска сервера
-        """
+    def __init__(self, host: str = '0.0.0.0', port: int = None):
         self.host = host
-        self.port = port
+        # Получаем порт из переменной окружения Render или используем 8000
+        self.port = int(os.environ.get('PORT', 8000))
         self.app = web.Application()
         self.callback_handler: Optional[Callable] = None
         self._setup_routes()
@@ -76,10 +71,11 @@ class CallbackServer:
             self.callback_handler = callback_handler
             self._runner = web.AppRunner(self.app)
             await self._runner.setup()
-            site = web.TCPSite(self._runner, 'localhost', self.port)
+            # Используем self.host вместо хардкода localhost
+            site = web.TCPSite(self._runner, self.host, self.port)
             await site.start()
             self._is_running = True
-            logger.info(f"Callback сервер запущен на порту {self.port}")
+            logger.info(f"Callback сервер запущен на {self.host}:{self.port}")
             return True
         except Exception as e:
             logger.error(f"Ошибка при запуске callback сервера: {e}")

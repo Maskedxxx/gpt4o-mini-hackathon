@@ -5,6 +5,7 @@ from aiogram import Bot
 from aiogram.types import Message
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
+import os
 
 from core.states import UserState
 from services.hh_api import HeadHunterAPI
@@ -25,20 +26,17 @@ logger = setup_logger(__name__)
 
 class AuthCommandHandler:
     def __init__(self, bot: Bot, hh_api: HeadHunterAPI, config: Config):
-        """
-        Инициализация обработчика команды авторизации.
-        
-        Args:
-            bot: Экземпляр бота
-            hh_api: Клиент API HeadHunter
-            config: Конфигурация приложения
-        """
         self.bot = bot
         self.hh_api = hh_api
         self.config = config
-        # Создаем колбек-сервер с учетом режима работы
+        
+        # Определяем хост и порт в зависимости от окружения
+        host = '0.0.0.0'  # Всегда используем 0.0.0.0 для привязки ко всем интерфейсам
+        port = int(os.environ.get('PORT', 8000))  # Получаем порт из переменной окружения
+        
         self.callback_server = CallbackServer(
-            host='0.0.0.0' if config.environment == Environment.DEMO else 'localhost'
+            host=host,
+            port=port
         )
         self._current_user_id: Optional[int] = None
         self._current_state: Optional[FSMContext] = None
@@ -81,9 +79,12 @@ class AuthCommandHandler:
                 await message.answer(AUTH_SERVER_ERROR_MSG)
                 return
             
-            # Обновляем redirect_uri в API-клиенте, если мы в демо-режиме
+            # В демо режиме используем URL из конфигурации
             if self.config.environment == Environment.DEMO:
-                self.hh_api.redirect_uri = self.config.hh.redirect_uri
+                domain = os.environ.get('RENDER_EXTERNAL_URL')
+                if domain:
+                    self.hh_api.redirect_uri = f"{domain}/callback"
+                    logger.info(f"Установлен redirect_uri: {self.hh_api.redirect_uri}")
             
             # Получаем URL для авторизации
             auth_url = self.hh_api.get_auth_url()

@@ -30,7 +30,7 @@ def print_tree(start_path, exclude_files=None, indent=""):
 
 if __name__ == "__main__":
     # Укажите путь к вашему проекту
-    project_path = "***"  # Замените на путь к вашему проекту
+    project_path = "/Users/mask/Documents/Проеты_2025/gpt_4_mini_hackaton/app_talebot_v3"  # Замените на путь к вашему проекту
 
     # Укажите файлы и папки, которые нужно исключить
     exclude_list = [".git", "__pycache__", ".DS_Store", "__init__.py", "LOG", "legacy", "tests"]

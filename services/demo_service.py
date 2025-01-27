@@ -33,7 +33,7 @@ class DemoService:
                 domain = os.environ.get('RENDER_EXTERNAL_URL', 'http://localhost:8000')
                 
                 # Обновляем redirect_uri в конфигурации
-                self.config.hh.update_redirect_uri(f"{domain}/callback")
+                self.config.hh.update_redirect_uri(f"{domain}")
                 logger.info(f"Установлен redirect_uri для production: {self.config.hh.redirect_uri}")
                 
                 # Выводим инструкции для настройки

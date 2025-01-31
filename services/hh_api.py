@@ -58,11 +58,13 @@ class HeadHunterAPI:
                 'redirect_uri': self.redirect_uri
             }
             
+            headers = {'User-Agent': 'Mozilla/5.0 (compatible; YourAppName/1.0)'}
+            
             # Добавляем логирование запроса
             logger.info(f"Отправка запроса на получение токенов. URL: {self.token_url}")
             logger.info(f"Параметры запроса: {payload}")
             
-            response = requests.post(self.token_url, data=payload)
+            response = requests.post(self.token_url, data=payload, headers=headers)
             
             # Логируем ответ сервера
             logger.info(f"Статус ответа: {response.status_code}")
